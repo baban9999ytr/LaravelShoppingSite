@@ -3,23 +3,27 @@ import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import CategoryItem from './CategoryItem.vue'
 
-// const props = defineProps({
-//   categories: {
-//     type: Array,
-//     required: true
-//   }
-// })
+interface Category {
+  id: number
+  name: string
+  parent_id?: number | null
+  children?: Category[]
+}
 
-defineProps<Props>();
+interface Props {
+  categories: Category[]
+}
+
+defineProps<Props>()
 
 const selectedParentName = ref('Ana Kategori (Kök Düğüm)')
 
 const form = useForm({
   name: '',
-  parent_id: null
+  parent_id: null as number | null
 })
 
-const setParent = (category) => {
+function setParent(category?: Category | null) {
   if (category) {
     form.parent_id = category.id
     selectedParentName.value = category.name
@@ -29,7 +33,7 @@ const setParent = (category) => {
   }
 }
 
-const submitForm = () => {
+function submitForm() {
   form.post(route('categories.store'), {
     onSuccess: () => {
       form.reset('name')
