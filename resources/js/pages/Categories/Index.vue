@@ -135,8 +135,10 @@ const handleCategoryDrop = (draggedId: number, newParentId: number | null) => {
 
 const handleRootDrop = (event: DragEvent) => {
     const draggedIdRaw = event.dataTransfer?.getData('text/plain');
+
     if (draggedIdRaw) {
         const draggedId = Number(draggedIdRaw);
+
         if (draggedId) {
             handleCategoryDrop(draggedId, null);
         }

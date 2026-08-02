@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 import { ref } from 'vue';
 import CategoryItem from './CategoryItem.vue';
-import { route } from 'ziggy-js';
 interface Category {
     id: number;
     name: string;

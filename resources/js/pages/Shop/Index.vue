@@ -171,6 +171,7 @@ const logout = () => {
 const toggleFavorite = (productId: number) => {
     if (!props.auth?.user) {
         router.get('/login');
+
         return;
     }
 
@@ -187,6 +188,7 @@ const toggleFavorite = (productId: number) => {
 const addToCart = (productId: number) => {
     if (!props.auth?.user) {
         router.get('/login');
+
         return;
     }
 

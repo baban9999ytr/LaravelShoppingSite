@@ -136,6 +136,7 @@ const variantForm = useForm({
 
 const handleFileChange = (e: Event, formInstance: any) => {
     const target = e.target as HTMLInputElement;
+
     if (target.files && target.files[0]) {
         formInstance.image_file = target.files[0];
     }
