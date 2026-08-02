@@ -1,6 +1,6 @@
-<script setup>
-import { ref, computed } from 'vue';
+<script setup lang="ts">
 import { Link, Head } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 
 const props = defineProps({
   product: {
@@ -30,12 +30,17 @@ const activeImage = ref(
 
 const images = computed(() => {
   const list = [];
-  if (props.product.image_url) list.push(props.product.image_url);
+
+  if (props.product.image_url) {
+list.push(props.product.image_url);
+}
+
   props.variants.forEach((v) => {
     if (v.image_url && !list.includes(v.image_url)) {
       list.push(v.image_url);
     }
   });
+
   return list.length ? list : ['https://via.placeholder.com/600x800?text=No+Image'];
 });
 
@@ -43,6 +48,7 @@ const currentPrice = computed(() => {
   if (selectedVariant.value && selectedVariant.value.price) {
     return Number(selectedVariant.value.price);
   }
+
   return Number(props.product.price || 0);
 });
 
@@ -50,6 +56,7 @@ const currentSku = computed(() => {
   if (selectedVariant.value && selectedVariant.value.sku) {
     return selectedVariant.value.sku;
   }
+
   return props.product.slug || `PRD-${props.product.id}`;
 });
 
@@ -57,14 +64,17 @@ const currentStock = computed(() => {
   if (selectedVariant.value) {
     return selectedVariant.value.stock ?? 0;
   }
+
   return 99; 
 });
 
 const selectVariant = (variant) => {
   selectedVariant.value = variant;
+
   if (variant.image_url) {
     activeImage.value = variant.image_url;
   }
+
   if (quantity.value > currentStock.value) {
     quantity.value = Math.max(1, currentStock.value);
   }

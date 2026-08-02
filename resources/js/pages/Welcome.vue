@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const page = usePage();
@@ -10,10 +10,10 @@ const dashboardUrl = computed(() =>
         : route('dashboard')
 );
 
-function goToDashboard() {
-    console.log('Navigating to dashboard...');
-    router.visit(dashboardUrl.value);
-}
+// function goToDashboard() {
+//     console.log('Navigating to dashboard...');
+//     router.visit(dashboardUrl.value);
+// }
 </script>
 
 <template>

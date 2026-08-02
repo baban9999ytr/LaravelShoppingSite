@@ -1,7 +1,7 @@
-<script setup>
-import { ref, computed } from 'vue';
+<script setup lang="ts">
 import { useForm, router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js'; 
+import { ref, computed } from 'vue';
+// import { route } from 'ziggy-js'; 
 const props = defineProps({
   features: {
     type: Array,
@@ -25,8 +25,12 @@ const valueForm = useForm({
 });
 
 const filteredFeatures = computed(() => {
-  if (!searchQuery.value) return props.features;
+  if (!searchQuery.value) {
+return props.features;
+}
+
   const q = searchQuery.value.toLowerCase();
+
   return props.features.filter(
     (f) =>
       f.name.toLowerCase().includes(q) ||
@@ -91,7 +95,10 @@ const deleteFeature = (feature) => {
 
 const submitQuickValue = (feature) => {
   const val = newValueInput.value[feature.id];
-  if (!val || !val.trim()) return;
+
+  if (!val || !val.trim()) {
+return;
+}
 
   valueForm.value = val;
   valueForm.post(`/features/${feature.id}/values`, {

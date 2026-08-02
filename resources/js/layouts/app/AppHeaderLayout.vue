@@ -4,7 +4,6 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppShell from '@/components/AppShell.vue';
 import { Toaster } from '@/components/ui/sonner';
 import type { BreadcrumbItem } from '@/types';
-import BackgroundMusic from '@/Components/BackgroundMusic.vue';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];

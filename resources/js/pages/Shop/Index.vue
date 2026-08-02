@@ -1,6 +1,6 @@
-<script setup>
-import { ref, reactive, computed } from 'vue';
+<script setup lang="ts">
 import { router, Link } from '@inertiajs/vue3';
+import { ref, reactive, computed } from 'vue';
 
 const props = defineProps({
   auth: {
@@ -51,17 +51,28 @@ const selectedFeatures = ref(
 );
 
 const cartItemCount = computed(() => {
-  if (!props.user_basket) return 0;
+  if (!props.user_basket) {
+return 0;
+}
+
   if (Array.isArray(props.user_basket)) {
     return props.user_basket.reduce((sum, item) => {
-      if (typeof item === 'number') return sum + 1;
-      if (item && typeof item.quantity === 'number') return sum + item.quantity;
+      if (typeof item === 'number') {
+return sum + 1;
+}
+
+      if (item && typeof item.quantity === 'number') {
+return sum + item.quantity;
+}
+
       return sum + 1;
     }, 0);
   }
+
   if (typeof props.user_basket === 'object' && typeof props.user_basket.total !== 'undefined') {
     return props.user_basket.total;
   }
+
   return 0;
 });
 
@@ -83,6 +94,7 @@ const applyPriceFilter = () => {
 
 const toggleFeatureFilter = (featureValueId) => {
   const index = selectedFeatures.value.indexOf(featureValueId);
+
   if (index > -1) {
     selectedFeatures.value.splice(index, 1);
   } else {
@@ -114,6 +126,7 @@ const logout = () => {
 const toggleFavorite = (productId) => {
   if (!props.auth?.user) {
     router.get('/login');
+
     return;
   }
 
@@ -130,6 +143,7 @@ const toggleFavorite = (productId) => {
 const addToCart = (productId) => {
   if (!props.auth?.user) {
     router.get('/login');
+
     return;
   }
 
@@ -147,22 +161,27 @@ const isFavorite = (productId) => {
   return props.user_favorites.includes(productId);
 };
 
-const isInCart = (productId) => {
-  if (!props.user_basket) return false;
+// const isInCart = (productId) => {
+//   if (!props.user_basket) {
+// return false;
+// }
 
-  if (Array.isArray(props.user_basket)) {
-    return props.user_basket.some((item) => {
-      if (typeof item === 'number') return item === productId;
-      return item?.product_id === productId || item?.id === productId;
-    });
-  }
+//   if (Array.isArray(props.user_basket)) {
+//     return props.user_basket.some((item) => {
+//       if (typeof item === 'number') {
+// return item === productId;
+// }
 
-  if (typeof props.user_basket === 'object' && Array.isArray(props.user_basket.data)) {
-    return props.user_basket.data.some((item) => item?.product_id === productId || item?.id === productId);
-  }
+//       return item?.product_id === productId || item?.id === productId;
+//     });
+//   }
 
-  return false;
-};
+//   if (typeof props.user_basket === 'object' && Array.isArray(props.user_basket.data)) {
+//     return props.user_basket.data.some((item) => item?.product_id === productId || item?.id === productId);
+//   }
+
+//   return false;
+// };
 </script>
 
 <template>
@@ -512,19 +531,20 @@ const isInCart = (productId) => {
             <p class="text-gray-500 text-sm">No products found matching your filter options.</p>
           </div>
 
-          <div v-if="products?.links && products.links.length" class="mt-8 flex justify-center space-x-1">
-            <Link 
-              v-for="(link, i) in products.links" 
-              :key="i"
-              :href="link.url || '#'"
-              v-html="link.label"
-              :class="[
-                'px-3 py-1.5 text-xs rounded border',
-                link.active ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50',
-                !link.url ? 'opacity-50 pointer-events-none' : ''
-              ]"
-            />
-          </div>
+     <div v-if="products?.links && products.links.length" class="mt-8 flex justify-center space-x-1">
+  <Link 
+    v-for="(link, i) in products.links" 
+    :key="i"
+    :href="link.url || '#'"
+    :class="[
+      'px-3 py-1.5 text-xs rounded border',
+      link.active ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50',
+      !link.url ? 'opacity-50 pointer-events-none' : ''
+    ]"
+  >
+    <span v-html="link.label"></span>
+  </Link>
+</div>
         </section>
       </div>
     </main>

@@ -1,14 +1,16 @@
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import CategoryItem from './CategoryItem.vue'
 
-const props = defineProps({
-  categories: {
-    type: Array,
-    required: true
-  }
-})
+// const props = defineProps({
+//   categories: {
+//     type: Array,
+//     required: true
+//   }
+// })
+
+defineProps<Props>();
 
 const selectedParentName = ref('Ana Kategori (Kök Düğüm)')
 

@@ -1,6 +1,6 @@
-<script setup>
-import { ref, computed } from 'vue' 
+<script setup lang="ts">
 import { useForm, router } from '@inertiajs/vue3'
+import { ref, computed } from 'vue' 
 
 const props = defineProps({
   products: {
@@ -31,7 +31,10 @@ const imageInputType = ref('file')
 const expandedProducts = ref(new Set())
 
 const productList = computed(() => {
-  if (!props.products) return []
+  if (!props.products) {
+return []
+}
+
   return Array.isArray(props.products)
     ? props.products
     : (props.products.data || [])
@@ -41,10 +44,12 @@ const flattenCategories = (nodes = [], prefix = '') => {
   let list = []
   nodes.forEach(node => {
     list.push({ id: node.id, name: prefix + node.name })
+
     if (node.children && node.children.length) {
       list = list.concat(flattenCategories(node.children, prefix + '-- '))
     }
   })
+
   return list
 }
 
@@ -58,6 +63,7 @@ const toggleExpand = (productId) => {
 
 const getProductVariants = (productId) => {
   const product = productList.value.find(p => p.id === productId)
+
   if (product && product.variants) {
     return product.variants
   }
@@ -134,7 +140,9 @@ const openEditModal = (product) => {
 }
 
 const submitUpdate = () => {
-  if (!selectedProduct.value) return
+  if (!selectedProduct.value) {
+return
+}
 
   editForm.post(`/products/${selectedProduct.value.id}`, {
     forceFormData: true,

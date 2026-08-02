@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { useForm, Head } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import CategoryItem from './CategoryItem.vue';
 
@@ -26,15 +26,18 @@ const setParent = (category: any) => {
 
 const flattenCategories = (nodes: any[], depth = 0): any[] => {
     let result: any[] = [];
+
     for (const node of nodes) {
         result.push({
             id: node.id,
             name: `${'— '.repeat(depth)}${node.name}`,
         });
+
         if (node.children && node.children.length > 0) {
             result = result.concat(flattenCategories(node.children, depth + 1));
         }
     }
+
     return result;
 };
 
@@ -96,17 +99,27 @@ const deleteCategory = (category: any) => {
 const handleCategoryDrop = (draggedId: number, newParentId: number | null) => {
     const findCategory = (list: any[], id: number): any => {
         for (const item of list) {
-            if (item.id === id) return item;
+            if (item.id === id) {
+return item;
+}
+
             if (item.children?.length) {
                 const found = findCategory(item.children, id);
-                if (found) return found;
+
+                if (found) {
+return found;
+}
             }
         }
+
         return null;
     };
 
     const targetCategory = findCategory(props.categories, draggedId);
-    if (!targetCategory) return;
+
+    if (!targetCategory) {
+return;
+}
 
     useForm({
         name: targetCategory.name,
