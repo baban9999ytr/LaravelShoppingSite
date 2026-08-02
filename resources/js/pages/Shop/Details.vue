@@ -2,44 +2,77 @@
 import { Link, Head } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
-const props = defineProps({
-    product: {
-        type: Object,
-        required: true,
-    },
-    categories: {
-        type: Array,
-        default: () => [],
-    },
-    featureValues: {
-        type: Array,
-        default: () => [],
-    },
-    variants: {
-        type: Array,
-        default: () => [],
-    },
+interface Category {
+    id: number;
+    name: string;
+    slug?: string;
+    [key: string]: any;
+}
+
+interface FeatureValue {
+    id: number;
+    value: string;
+    feature?: {
+        id?: number;
+        name?: string;
+    };
+    [key: string]: any;
+}
+
+interface Variant {
+    id: number;
+    sku?: string;
+    price?: number | string;
+    stock?: number;
+    color?: string;
+    size?: string;
+    image_url?: string;
+    featureValues?: FeatureValue[];
+    [key: string]: any;
+}
+
+interface Product {
+    id: number;
+    name: string;
+    price?: number | string;
+    slug?: string;
+    description?: string;
+    image_url?: string;
+    [key: string]: any;
+}
+
+interface Props {
+    product: Product;
+    categories?: Category[];
+    featureValues?: FeatureValue[];
+    variants?: Variant[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    categories: () => [],
+    featureValues: () => [],
+    variants: () => [],
 });
 
-const selectedVariant = ref(
+const selectedVariant = ref<Variant | null>(
     props.variants && props.variants.length ? props.variants[0] : null,
 );
 const quantity = ref(1);
 
-const activeImage = ref(
+const activeImage = ref<string>(
     selectedVariant.value?.image_url ||
         props.product.image_url ||
         'https://via.placeholder.com/600x800?text=No+Image',
 );
 
-const images = computed(() => {
-    const list = [];
+const images = computed<string[]>(() => {
+    const list: string[] = [];
 
     if (props.product.image_url) {
         list.push(props.product.image_url);
     }
 
-    props.variants.forEach((v) => {
+    props.variants.forEach((v: Variant) => {
         if (v.image_url && !list.includes(v.image_url)) {
             list.push(v.image_url);
         }
@@ -50,7 +83,7 @@ const images = computed(() => {
         : ['https://via.placeholder.com/600x800?text=No+Image'];
 });
 
-const currentPrice = computed(() => {
+const currentPrice = computed<number>(() => {
     if (selectedVariant.value && selectedVariant.value.price) {
         return Number(selectedVariant.value.price);
     }
@@ -58,7 +91,7 @@ const currentPrice = computed(() => {
     return Number(props.product.price || 0);
 });
 
-const currentSku = computed(() => {
+const currentSku = computed<string>(() => {
     if (selectedVariant.value && selectedVariant.value.sku) {
         return selectedVariant.value.sku;
     }
@@ -66,7 +99,7 @@ const currentSku = computed(() => {
     return props.product.slug || `PRD-${props.product.id}`;
 });
 
-const currentStock = computed(() => {
+const currentStock = computed<number>(() => {
     if (selectedVariant.value) {
         return selectedVariant.value.stock ?? 0;
     }
@@ -74,7 +107,7 @@ const currentStock = computed(() => {
     return 99;
 });
 
-const selectVariant = (variant) => {
+const selectVariant = (variant: Variant) => {
     selectedVariant.value = variant;
 
     if (variant.image_url) {

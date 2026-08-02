@@ -1,18 +1,31 @@
 <script setup lang="ts">
 import { useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-// import { route } from 'ziggy-js';
-const props = defineProps({
-    features: {
-        type: Array,
-        default: () => [],
-    },
+
+interface FeatureValue {
+    id: number;
+    value: string;
+}
+
+interface Feature {
+    id: number;
+    name: string;
+    slug: string;
+    values?: FeatureValue[];
+}
+
+interface Props {
+    features?: Feature[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    features: () => [],
 });
 
 const searchQuery = ref('');
 const isModalOpen = ref(false);
-const editingFeature = ref(null);
-const newValueInput = ref({});
+const editingFeature = ref<Feature | null>(null);
+const newValueInput = ref<Record<number, string>>({});
 
 const form = useForm({
     name: '',
@@ -24,7 +37,7 @@ const valueForm = useForm({
     value: '',
 });
 
-const filteredFeatures = computed(() => {
+const filteredFeatures = computed<Feature[]>(() => {
     if (!searchQuery.value) {
         return props.features;
     }
@@ -47,12 +60,12 @@ const openCreateModal = () => {
     isModalOpen.value = true;
 };
 
-const openEditModal = (feature) => {
+const openEditModal = (feature: Feature) => {
     editingFeature.value = feature;
     form.clearErrors();
     form.name = feature.name;
     form.slug = feature.slug;
-    form.values = feature.values.map((v) => ({ value: v.value }));
+    form.values = feature.values ? feature.values.map((v) => ({ value: v.value })) : [{ value: '' }];
     isModalOpen.value = true;
 };
 
@@ -65,7 +78,7 @@ const addValueRow = () => {
     form.values.push({ value: '' });
 };
 
-const removeValueRow = (index) => {
+const removeValueRow = (index: number) => {
     if (form.values.length > 1) {
         form.values.splice(index, 1);
     }
@@ -85,7 +98,7 @@ const submitFeatureForm = () => {
     }
 };
 
-const deleteFeature = (feature) => {
+const deleteFeature = (feature: Feature) => {
     if (
         confirm(
             `"${feature.name}" özelliğini silmek istediğinize emin misiniz?`,
@@ -97,7 +110,7 @@ const deleteFeature = (feature) => {
     }
 };
 
-const submitQuickValue = (feature) => {
+const submitQuickValue = (feature: Feature) => {
     const val = newValueInput.value[feature.id];
 
     if (!val || !val.trim()) {
@@ -114,7 +127,7 @@ const submitQuickValue = (feature) => {
     });
 };
 
-const deleteValue = (valueId) => {
+const deleteValue = (valueId: number) => {
     if (confirm('Bu değeri silmek istediğinize emin misiniz?')) {
         router.delete(`/feature-values/${valueId}`, {
             preserveScroll: true,
@@ -122,7 +135,6 @@ const deleteValue = (valueId) => {
     }
 };
 </script>
-
 <template>
     <div class="min-h-screen bg-slate-50 p-6">
         <div class="mx-auto max-w-7xl">

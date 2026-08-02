@@ -2,19 +2,16 @@
 import { computed } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/composables/useInitials';
-// import type { Team, User } from '@/types';
+import type { Team, User } from '@/types';
 
-// type Props = {
-//   user?: User | null;
-//   team?: Team;
-// };
+interface Props {
+    user?: User | null;
+    team?: Team | null | { name: string; [key: string]: any };
+    showEmail?: boolean;
+}
 
-const props = defineProps({
-    user: Object,
-    showEmail: {
-        type: Boolean,
-        default: true,
-    },
+const props = withDefaults(defineProps<Props>(), {
+    showEmail: true,
 });
 
 const { getInitials } = useInitials();

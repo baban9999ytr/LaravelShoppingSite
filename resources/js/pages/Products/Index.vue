@@ -2,35 +2,60 @@
 import { useForm, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
-const props = defineProps({
-    products: {
-        type: [Array, Object],
-        default: () => ({ data: [] }),
-    },
-    categories: {
-        type: Array,
-        default: () => [],
-    },
-    features: {
-        type: Array,
-        default: () => [],
-    },
-    variant: {
-        type: Array,
-        default: () => [],
-    },
+interface Category {
+    id: number;
+    name: string;
+    children?: Category[];
+    [key: string]: any;
+}
+
+interface Variant {
+    id: number;
+    product_id: number;
+    sku: string;
+    price: number | string;
+    stock: number;
+    color?: string;
+    size?: string;
+    image_url?: string;
+    [key: string]: any;
+}
+
+interface Product {
+    id: number;
+    name: string;
+    price: number | string;
+    description?: string;
+    image_url?: string;
+    categories?: Category[];
+    variants?: Variant[];
+    [key: string]: any;
+}
+
+interface Props {
+    products?: Product[] | { data: Product[]; [key: string]: any };
+    categories?: Category[];
+    features?: any[];
+    variant?: Variant[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    products: () => ({ data: [] }),
+    categories: () => [],
+    features: () => [],
+    variant: () => [],
 });
 
 const isCreateModalOpen = ref(false);
 const isEditModalOpen = ref(false);
 const isVariantModalOpen = ref(false);
 
-const selectedProduct = ref(null);
-const selectedVariant = ref(null);
+const selectedProduct = ref<Product | null>(null);
+const selectedVariant = ref<Variant | null>(null);
 const imageInputType = ref('file');
-const expandedProducts = ref(new Set());
+const expandedProducts = ref<Set<number>>(new Set());
 
-const productList = computed(() => {
+const productList = computed<Product[]>(() => {
     if (!props.products) {
         return [];
     }
@@ -40,8 +65,11 @@ const productList = computed(() => {
         : props.products.data || [];
 });
 
-const flattenCategories = (nodes = [], prefix = '') => {
-    let list = [];
+const flattenCategories = (
+    nodes: Category[] = [],
+    prefix = '',
+): { id: number; name: string }[] => {
+    let list: { id: number; name: string }[] = [];
     nodes.forEach((node) => {
         list.push({ id: node.id, name: prefix + node.name });
 
@@ -55,7 +83,7 @@ const flattenCategories = (nodes = [], prefix = '') => {
     return list;
 };
 
-const toggleExpand = (productId) => {
+const toggleExpand = (productId: number) => {
     if (expandedProducts.value.has(productId)) {
         expandedProducts.value.delete(productId);
     } else {
@@ -63,7 +91,7 @@ const toggleExpand = (productId) => {
     }
 };
 
-const getProductVariants = (productId) => {
+const getProductVariants = (productId: number): Variant[] => {
     const product = productList.value.find((p) => p.id === productId);
 
     if (product && product.variants) {
@@ -77,28 +105,27 @@ const getProductVariants = (productId) => {
     return [];
 };
 
-// Forms
 const createForm = useForm({
     name: '',
     price: '',
     description: '',
-    image_file: null,
+    image_file: null as File | null,
     image_url: '',
-    category_ids: [],
+    category_ids: [] as number[],
 });
 
 const editForm = useForm({
     name: '',
     price: '',
     description: '',
-    image_file: null,
+    image_file: null as File | null,
     image_url: '',
-    category_ids: [],
+    category_ids: [] as number[],
     _method: 'PUT',
 });
 
 const variantForm = useForm({
-    product_id: null,
+    product_id: null as number | null,
     sku: '',
     price: '',
     stock: 0,
@@ -107,9 +134,10 @@ const variantForm = useForm({
     image_url: '',
 });
 
-const handleFileChange = (e, form) => {
-    if (e.target.files && e.target.files[0]) {
-        form.image_file = e.target.files[0];
+const handleFileChange = (e: Event, formInstance: any) => {
+    const target = e.target as HTMLInputElement;
+    if (target.files && target.files[0]) {
+        formInstance.image_file = target.files[0];
     }
 };
 
@@ -129,11 +157,11 @@ const submitCreate = () => {
     });
 };
 
-const openEditModal = (product) => {
+const openEditModal = (product: Product) => {
     selectedProduct.value = product;
     editForm.clearErrors();
     editForm.name = product.name;
-    editForm.price = product.price;
+    editForm.price = String(product.price ?? '');
     editForm.description = product.description || '';
     editForm.image_url = product.image_url || '';
     editForm.image_file = null;
@@ -157,7 +185,7 @@ const submitUpdate = () => {
     });
 };
 
-const confirmDelete = (product) => {
+const confirmDelete = (product: Product) => {
     if (
         confirm(
             `"${product.name}" isimli ürünü silmek istediğinize emin misiniz?`,
@@ -167,21 +195,21 @@ const confirmDelete = (product) => {
     }
 };
 
-const openCreateVariantModal = (product) => {
+const openCreateVariantModal = (product: Product) => {
     selectedVariant.value = null;
     variantForm.reset();
     variantForm.clearErrors();
     variantForm.product_id = product.id;
-    variantForm.price = product.price;
+    variantForm.price = String(product.price ?? '');
     isVariantModalOpen.value = true;
 };
 
-const openEditVariantModal = (variantItem) => {
+const openEditVariantModal = (variantItem: Variant) => {
     selectedVariant.value = variantItem;
     variantForm.clearErrors();
     variantForm.product_id = variantItem.product_id;
     variantForm.sku = variantItem.sku;
-    variantForm.price = variantItem.price;
+    variantForm.price = String(variantItem.price ?? '');
     variantForm.stock = variantItem.stock;
     variantForm.color = variantItem.color || '';
     variantForm.size = variantItem.size || '';
@@ -207,7 +235,7 @@ const submitVariant = () => {
     }
 };
 
-const deleteVariant = (variantItem) => {
+const deleteVariant = (variantItem: Variant) => {
     if (
         confirm(
             `"${variantItem.sku}" SKU'lu varyantı silmek istediğinize emin misiniz?`,
@@ -241,16 +269,16 @@ const deleteVariant = (variantItem) => {
             </div>
 
             <div
-                v-if="$page.props.flash?.status"
+                v-if="($page.props as any).flash?.status"
                 class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
             >
-                {{ $page.props.flash.status }}
+                {{ ($page.props as any).flash.status }}
             </div>
             <div
-                v-if="$page.props.flash?.error"
+                v-if="($page.props as any).flash?.error"
                 class="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800"
             >
-                {{ $page.props.flash.error }}
+                {{ ($page.props as any).flash.error }}
             </div>
 
             <div
@@ -483,6 +511,7 @@ const deleteVariant = (variantItem) => {
             </div>
         </div>
 
+        <!-- Create Modal -->
         <div
             v-if="isCreateModalOpen"
             class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
@@ -566,7 +595,9 @@ const deleteVariant = (variantItem) => {
                             <input
                                 v-if="imageInputType === 'file'"
                                 type="file"
-                                @change="(e) => handleFileChange(e, createForm)"
+                                @change="
+                                    (e) => handleFileChange(e, createForm)
+                                "
                                 accept="image/*"
                                 class="w-full text-xs"
                             />
@@ -622,6 +653,7 @@ const deleteVariant = (variantItem) => {
             </div>
         </div>
 
+        <!-- Edit Modal -->
         <div
             v-if="isEditModalOpen"
             class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
@@ -730,6 +762,7 @@ const deleteVariant = (variantItem) => {
             </div>
         </div>
 
+        <!-- Variant Modal -->
         <div
             v-if="isVariantModalOpen"
             class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"

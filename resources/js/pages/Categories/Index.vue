@@ -132,6 +132,16 @@ const handleCategoryDrop = (draggedId: number, newParentId: number | null) => {
         preserveScroll: true,
     });
 };
+
+const handleRootDrop = (event: DragEvent) => {
+    const draggedIdRaw = event.dataTransfer?.getData('text/plain');
+    if (draggedIdRaw) {
+        const draggedId = Number(draggedIdRaw);
+        if (draggedId) {
+            handleCategoryDrop(draggedId, null);
+        }
+    }
+};
 </script>
 
 <template>
@@ -149,7 +159,6 @@ const handleCategoryDrop = (draggedId: number, newParentId: number | null) => {
                 </h1>
 
                 <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
-                    <!-- Form Section -->
                     <div
                         class="h-fit rounded-xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-200 dark:bg-white dark:text-slate-900"
                     >
@@ -273,7 +282,6 @@ const handleCategoryDrop = (draggedId: number, newParentId: number | null) => {
                         </form>
                     </div>
 
-                    <!-- Tree View Section -->
                     <div
                         class="rounded-xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm md:col-span-2 dark:border-slate-200 dark:bg-white dark:text-slate-900"
                     >
@@ -300,16 +308,9 @@ const handleCategoryDrop = (draggedId: number, newParentId: number | null) => {
                             </button>
                         </div>
 
-                        <!-- Root Drop Zone -->
                         <div
                             @dragover.prevent
-                            @drop="
-                                const draggedId = Number(
-                                    $event.dataTransfer?.getData('text/plain'),
-                                );
-                                if (draggedId)
-                                    handleCategoryDrop(draggedId, null);
-                            "
+                            @drop="handleRootDrop"
                             class="mb-4 cursor-pointer rounded-lg border-2 border-dashed border-slate-300 p-3 text-center text-xs font-medium text-slate-500 transition hover:border-indigo-400 hover:bg-indigo-50/50 dark:border-slate-300 dark:text-slate-500"
                         >
                             Ana Kategori Yapmak İçin Buraya Sürükleyin (Root

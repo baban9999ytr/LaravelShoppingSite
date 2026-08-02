@@ -2,20 +2,30 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-const page = usePage();
+declare const route: any;
+
+interface CurrentTeam {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+interface PageProps {
+    auth?: {
+        user?: any;
+    };
+    currentTeam?: CurrentTeam | null;
+    [key: string]: any;
+}
+
+const page = usePage<PageProps>();
 
 const dashboardUrl = computed(() =>
     page.props.currentTeam
         ? route('dashboard', { current_team: page.props.currentTeam.slug })
         : route('dashboard'),
 );
-
-// function goToDashboard() {
-//     console.log('Navigating to dashboard...');
-//     router.visit(dashboardUrl.value);
-// }
 </script>
-
 <template>
     <Head title="Welcome">
         <link rel="preconnect" href="https://rsms.me/" />

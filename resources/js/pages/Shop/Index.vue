@@ -2,47 +2,82 @@
 import { router, Link } from '@inertiajs/vue3';
 import { ref, reactive, computed } from 'vue';
 
-const props = defineProps({
-    auth: {
-        type: Object,
-        default: () => ({ user: null }),
-    },
-    categories: {
-        type: Array,
-        default: () => [],
-    },
-    products: {
-        type: Object,
-        default: () => ({ data: [], links: [], total: 0 }),
-    },
-    features: {
-        type: Array,
-        default: () => [],
-    },
-    filters: {
-        type: Object,
-        default: () => ({}),
-    },
-    user_favorites: {
-        type: Array,
-        default: () => [],
-    },
-    user_basket: {
-        type: Array,
-        default: () => [],
-    },
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    avatar?: string;
+}
+
+interface Category {
+    id: number;
+    name: string;
+    slug?: string;
+    children?: Category[];
+}
+
+interface FeatureValue {
+    id: number;
+    value: string;
+}
+
+interface Feature {
+    id: number;
+    name: string;
+    values?: FeatureValue[];
+}
+
+interface BasketItemObject {
+    id?: number;
+    product_id?: number;
+    quantity?: number;
+    [key: string]: any;
+}
+
+type BasketType = number[] | BasketItemObject[] | { data?: BasketItemObject[]; total?: number };
+
+interface Props {
+    auth?: {
+        user?: User | null;
+    };
+    categories?: Category[];
+    products?: {
+        data: any[];
+        links: any[];
+        total: number;
+    };
+    features?: Feature[];
+    filters?: {
+        search?: string;
+        min_price?: string | number;
+        max_price?: string | number;
+        features?: number | number[];
+        [key: string]: any;
+    };
+    user_favorites?: number[];
+    user_basket?: BasketType;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    auth: () => ({ user: null }),
+    categories: () => [],
+    products: () => ({ data: [], links: [], total: 0 }),
+    features: () => [],
+    filters: () => ({}),
+    user_favorites: () => [],
+    user_basket: () => [],
 });
 
 const isUserMenuOpen = ref(false);
 const search = ref(props.filters?.search || '');
-const openMenuId = ref(null);
+const openMenuId = ref<number | null>(null);
 
 const priceFilter = reactive({
     min_price: props.filters?.min_price || '',
     max_price: props.filters?.max_price || '',
 });
 
-const selectedFeatures = ref(
+const selectedFeatures = ref<number[]>(
     Array.isArray(props.filters?.features)
         ? props.filters.features.map(Number)
         : props.filters?.features
@@ -50,13 +85,13 @@ const selectedFeatures = ref(
           : [],
 );
 
-const cartItemCount = computed(() => {
+const cartItemCount = computed<number>(() => {
     if (!props.user_basket) {
         return 0;
     }
 
     if (Array.isArray(props.user_basket)) {
-        return props.user_basket.reduce((sum, item) => {
+        return props.user_basket.reduce((sum: number, item: any) => {
             if (typeof item === 'number') {
                 return sum + 1;
             }
@@ -71,7 +106,8 @@ const cartItemCount = computed(() => {
 
     if (
         typeof props.user_basket === 'object' &&
-        typeof props.user_basket.total !== 'undefined'
+        'total' in props.user_basket &&
+        typeof props.user_basket.total === 'number'
     ) {
         return props.user_basket.total;
     }
@@ -99,7 +135,7 @@ const applyPriceFilter = () => {
     );
 };
 
-const toggleFeatureFilter = (featureValueId) => {
+const toggleFeatureFilter = (featureValueId: number) => {
     const index = selectedFeatures.value.indexOf(featureValueId);
 
     if (index > -1) {
@@ -132,10 +168,9 @@ const logout = () => {
     router.post('/logout');
 };
 
-const toggleFavorite = (productId) => {
+const toggleFavorite = (productId: number) => {
     if (!props.auth?.user) {
         router.get('/login');
-
         return;
     }
 
@@ -149,10 +184,9 @@ const toggleFavorite = (productId) => {
     );
 };
 
-const addToCart = (productId) => {
+const addToCart = (productId: number) => {
     if (!props.auth?.user) {
         router.get('/login');
-
         return;
     }
 
@@ -166,31 +200,9 @@ const addToCart = (productId) => {
     );
 };
 
-const isFavorite = (productId) => {
-    return props.user_favorites.includes(productId);
+const isFavorite = (productId: number): boolean => {
+    return props.user_favorites ? props.user_favorites.includes(productId) : false;
 };
-
-// const isInCart = (productId) => {
-//   if (!props.user_basket) {
-// return false;
-// }
-
-//   if (Array.isArray(props.user_basket)) {
-//     return props.user_basket.some((item) => {
-//       if (typeof item === 'number') {
-// return item === productId;
-// }
-
-//       return item?.product_id === productId || item?.id === productId;
-//     });
-//   }
-
-//   if (typeof props.user_basket === 'object' && Array.isArray(props.user_basket.data)) {
-//     return props.user_basket.data.some((item) => item?.product_id === productId || item?.id === productId);
-//   }
-
-//   return false;
-// };
 </script>
 
 <template>
@@ -748,7 +760,7 @@ const isFavorite = (productId) => {
                                     >
                                         {{
                                             product.categories
-                                                ?.map((c) => c.name)
+                                                ?.map((c: any) => c.name)
                                                 .join(', ')
                                         }}
                                     </div>
