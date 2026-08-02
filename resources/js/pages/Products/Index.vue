@@ -596,9 +596,7 @@ const deleteVariant = (variantItem: Variant) => {
                             <input
                                 v-if="imageInputType === 'file'"
                                 type="file"
-                                @change="
-                                    (e) => handleFileChange(e, createForm)
-                                "
+                                @change="(e) => handleFileChange(e, createForm)"
                                 accept="image/*"
                                 class="w-full text-xs"
                             />

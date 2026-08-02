@@ -34,7 +34,10 @@ interface BasketItemObject {
     [key: string]: any;
 }
 
-type BasketType = number[] | BasketItemObject[] | { data?: BasketItemObject[]; total?: number };
+type BasketType =
+    | number[]
+    | BasketItemObject[]
+    | { data?: BasketItemObject[]; total?: number };
 
 interface Props {
     auth?: {
@@ -203,7 +206,9 @@ const addToCart = (productId: number) => {
 };
 
 const isFavorite = (productId: number): boolean => {
-    return props.user_favorites ? props.user_favorites.includes(productId) : false;
+    return props.user_favorites
+        ? props.user_favorites.includes(productId)
+        : false;
 };
 </script>
 

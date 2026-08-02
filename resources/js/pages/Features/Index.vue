@@ -65,7 +65,9 @@ const openEditModal = (feature: Feature) => {
     form.clearErrors();
     form.name = feature.name;
     form.slug = feature.slug;
-    form.values = feature.values ? feature.values.map((v) => ({ value: v.value })) : [{ value: '' }];
+    form.values = feature.values
+        ? feature.values.map((v) => ({ value: v.value }))
+        : [{ value: '' }];
     isModalOpen.value = true;
 };
 
