@@ -39,7 +39,6 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
             title="Settings"
             description="Manage your profile and account settings"
         />
-        
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">

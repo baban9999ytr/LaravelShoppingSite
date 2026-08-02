@@ -17,7 +17,7 @@ createInertiaApp({
     resolve: (name) =>
         resolvePageComponent(
             `./pages/${name}.vue`,
-            import.meta.glob<DefineComponent>('./pages/**/*.vue')
+            import.meta.glob<DefineComponent>('./pages/**/*.vue'),
         ),
     layout: (name) => {
         switch (true) {
@@ -35,7 +35,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(ZiggyVue, Ziggy as any) 
+            .use(ZiggyVue, Ziggy as any)
             .mount(el);
     },
     progress: {

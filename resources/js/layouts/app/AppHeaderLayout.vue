@@ -14,7 +14,6 @@ withDefaults(defineProps<Props>(), {
 });
 </script>
 
-
 <template>
     <AppShell variant="header">
         <AppHeader :breadcrumbs="breadcrumbs" />

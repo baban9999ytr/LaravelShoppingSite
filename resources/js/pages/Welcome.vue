@@ -5,9 +5,9 @@ import { computed } from 'vue';
 const page = usePage();
 
 const dashboardUrl = computed(() =>
-    page.props.currentTeam 
-        ? route('dashboard', { current_team: page.props.currentTeam.slug }) 
-        : route('dashboard')
+    page.props.currentTeam
+        ? route('dashboard', { current_team: page.props.currentTeam.slug })
+        : route('dashboard'),
 );
 
 // function goToDashboard() {
@@ -24,9 +24,7 @@ const dashboardUrl = computed(() =>
     <div
         class="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]"
     >
-        <header
-            class="mb-6 w-full max-w-83.75 text-sm lg:max-w-4xl"
-        >
+        <header class="mb-6 w-full max-w-83.75 text-sm lg:max-w-4xl">
             <nav class="flex items-center justify-end gap-4">
                 <template v-if="$page.props.auth.user">
                     <Link

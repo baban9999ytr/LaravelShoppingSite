@@ -20,7 +20,9 @@ const onDeleteCategory = (cat: any) => emit('delete-category', cat);
 
 <template>
     <li class="my-1">
-        <div class="flex items-center justify-between p-2 rounded bg-gray-50 hover:bg-gray-100 border border-gray-200 group">
+        <div
+            class="group flex items-center justify-between rounded border border-gray-200 bg-gray-50 p-2 hover:bg-gray-100"
+        >
             <span class="font-medium text-gray-700">
                 {{ category.name }}
             </span>
@@ -29,7 +31,7 @@ const onDeleteCategory = (cat: any) => emit('delete-category', cat);
                 <button
                     type="button"
                     @click.prevent="onSelectParent(category)"
-                    class="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition"
+                    class="rounded bg-indigo-50 px-2 py-1 text-xs text-indigo-600 transition hover:bg-indigo-100"
                 >
                     + Alt Ekle
                 </button>
@@ -37,7 +39,7 @@ const onDeleteCategory = (cat: any) => emit('delete-category', cat);
                 <button
                     type="button"
                     @click.prevent="onEditCategory(category)"
-                    class="text-xs px-2 py-1 bg-amber-50 text-amber-600 rounded hover:bg-amber-100 transition"
+                    class="rounded bg-amber-50 px-2 py-1 text-xs text-amber-600 transition hover:bg-amber-100"
                 >
                     Düzenle
                 </button>
@@ -45,14 +47,17 @@ const onDeleteCategory = (cat: any) => emit('delete-category', cat);
                 <button
                     type="button"
                     @click.prevent="onDeleteCategory(category)"
-                    class="text-xs px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition"
+                    class="rounded bg-red-50 px-2 py-1 text-xs text-red-600 transition hover:bg-red-100"
                 >
                     Sil
                 </button>
             </div>
         </div>
 
-        <ul v-if="category.children && category.children.length > 0" class="pl-6 border-l-2 border-indigo-200 mt-1 space-y-1">
+        <ul
+            v-if="category.children && category.children.length > 0"
+            class="mt-1 space-y-1 border-l-2 border-indigo-200 pl-6"
+        >
             <CategoryItem
                 v-for="child in category.children"
                 :key="child.id"

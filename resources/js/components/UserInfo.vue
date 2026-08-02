@@ -5,17 +5,17 @@ import { useInitials } from '@/composables/useInitials';
 // import type { Team, User } from '@/types';
 
 // type Props = {
-//   user?: User | null; 
+//   user?: User | null;
 //   team?: Team;
 // };
 
 const props = defineProps({
-  user: Object,
-  showEmail: {
-    type: Boolean,
-    default: true
-  }
-})
+    user: Object,
+    showEmail: {
+        type: Boolean,
+        default: true,
+    },
+});
 
 const { getInitials } = useInitials();
 
