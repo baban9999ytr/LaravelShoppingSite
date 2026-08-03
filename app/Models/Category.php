@@ -16,7 +16,6 @@ class Category extends Model
         'parent_id',
     ];
 
-
     public function products()
     {
         return $this->belongsToMany(Product::class, 'category_product');

@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class DebugRequestLogger
@@ -16,16 +15,16 @@ class DebugRequestLogger
             $user = $request->user() ? $request->user()->id : 'GUEST';
             $userAgent = substr($request->header('User-Agent', 'Unknown'), 0, 40);
 
-            error_log("------------------------------------------------");
+            error_log('------------------------------------------------');
             error_log(sprintf(
-                "[DEBUG LOG] %s %s | Inertia: %s | User: %s | UA: %s",
+                '[DEBUG LOG] %s %s | Inertia: %s | User: %s | UA: %s',
                 $request->method(),
                 $request->fullUrl(),
                 $isInertia,
                 $user,
                 $userAgent
             ));
-            error_log("------------------------------------------------");
+            error_log('------------------------------------------------');
         }
 
         return $next($request);

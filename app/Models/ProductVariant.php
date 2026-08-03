@@ -19,7 +19,7 @@ class ProductVariant extends Model
         'color',
         'size',
         'image_url',
-        'attributes'
+        'attributes',
     ];
 
     protected $casts = [

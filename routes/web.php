@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 // Main Shop Index as Home
 Route::get('/', [GuiController::class, 'index'])->name('shop.index');
-Route::get('/home', fn() => redirect()->route('shop.index'))->name('home');
+Route::get('/home', fn () => redirect()->route('shop.index'))->name('home');
 
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
@@ -21,6 +21,9 @@ Route::prefix('{current_team}')
     });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
+    Route::delete('invitations/{invitation}', [TeamInvitationController::class, 'decline'])->name('invitations.decline');
+
     Route::post('/favorites/toggle', [ProductController::class, 'toggleFavorite'])->name('favorites.toggle');
     Route::post('/basket/add', [ProductController::class, 'AddToBasket'])->name('basket.add');
 
@@ -28,9 +31,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
-    Route::delete('invitations/{invitation}', [TeamInvitationController::class, 'decline'])->name('invitations.decline');
-
     Route::resource('categories', CategoryController::class)->except(['create', 'edit', 'show']);
     Route::resource('products', ProductController::class)->except(['create', 'edit', 'show']);
 
@@ -47,13 +47,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/feature-values/{featureValue}', [ProductController::class, 'destroyFeatureValue'])->name('features.values.destroy');
 });
 
-require __DIR__ . '/settings.php';
+require __DIR__.'/settings.php';
 
 Route::get('/media/music/{filename}', function ($filename) {
     $disk = Storage::disk('public');
-    $relativePath = 'musics/' . $filename;
+    $relativePath = 'musics/'.$filename;
 
-    if (!$disk->exists($relativePath)) {
+    if (! $disk->exists($relativePath)) {
         abort(404);
     }
 
@@ -63,7 +63,7 @@ Route::get('/media/music/{filename}', function ($filename) {
 Route::middleware(['auth'])->get('/dashboard-redirect', function (Request $request) {
     $team = $request->user()->currentTeam;
 
-    if (!$team) {
+    if (! $team) {
         return redirect()->route('shop.index');
     }
 

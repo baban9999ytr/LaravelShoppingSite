@@ -1,0 +1,283 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property App\\Models\\Category\:\:\$parent_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/CategoryController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Category\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Category\>\:\:isDescendantOf\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/CategoryController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Category\:\:defaultOrder\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/CategoryController.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''App\\\\Models\\\\Category'' and ''appendToNode'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Http/Controllers/CategoryController.php
+
+		-
+			message: '#^Parameter \#1 \$parent of method App\\Models\\Category\:\:appendToNode\(\) expects App\\Models\\Category, App\\Models\\Category\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Category\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/CategoryController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Category\:\:defaultOrder\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/GuiController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Category\:\:descendantsAndSelf\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/GuiController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\GuiController\:\:productDetails\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/GuiController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Category\:\:defaultOrder\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Category\:\:descendantsAndSelf\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Class App\\Models\\Attribute uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Attribute.php
+
+		-
+			message: '#^Method App\\Models\\Attribute\:\:values\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Attribute.php
+
+		-
+			message: '#^Class App\\Models\\AttributeValue uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AttributeValue.php
+
+		-
+			message: '#^Method App\\Models\\AttributeValue\:\:attribute\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AttributeValue.php
+
+		-
+			message: '#^Method App\\Models\\AttributeValue\:\:variants\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AttributeValue.php
+
+		-
+			message: '#^Class App\\Models\\Category uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^Method App\\Models\\Category\:\:products\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^Class App\\Models\\Colour uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Colours.php
+
+		-
+			message: '#^Method App\\Models\\Colour\:\:products\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Colours.php
+
+		-
+			message: '#^Class App\\Models\\Favorite uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Favorite.php
+
+		-
+			message: '#^Method App\\Models\\Favorite\:\:product\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Favorite.php
+
+		-
+			message: '#^Method App\\Models\\Favorite\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Favorite.php
+
+		-
+			message: '#^Class App\\Models\\Feature uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Feature.php
+
+		-
+			message: '#^Method App\\Models\\Feature\:\:values\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Feature.php
+
+		-
+			message: '#^Class App\\Models\\FeatureValue uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FeatureValue.php
+
+		-
+			message: '#^Method App\\Models\\FeatureValue\:\:feature\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FeatureValue.php
+
+		-
+			message: '#^Method App\\Models\\FeatureValue\:\:products\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FeatureValue.php
+
+		-
+			message: '#^Method App\\Models\\FeatureValue\:\:variants\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/FeatureValue.php
+
+		-
+			message: '#^Class App\\Models\\Product uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Product.php
+
+		-
+			message: '#^Method App\\Models\\Product\:\:categories\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Product.php
+
+		-
+			message: '#^Method App\\Models\\Product\:\:featureValues\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Product.php
+
+		-
+			message: '#^Method App\\Models\\Product\:\:variants\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Product.php
+
+		-
+			message: '#^Class App\\Models\\ProductVariant uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ProductVariant.php
+
+		-
+			message: '#^Method App\\Models\\ProductVariant\:\:featureValues\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ProductVariant.php
+
+		-
+			message: '#^Method App\\Models\\ProductVariant\:\:product\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ProductVariant.php
+
+		-
+			message: '#^Class App\\Models\\ShoppingBasket uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ShoppingBasket.php
+
+		-
+			message: '#^Method App\\Models\\ShoppingBasket\:\:product\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ShoppingBasket.php
+
+		-
+			message: '#^Method App\\Models\\ShoppingBasket\:\:user\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ShoppingBasket.php
+
+		-
+			message: '#^Class App\\Models\\Size uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/size.php
+
+		-
+			message: '#^Method App\\Models\\Size\:\:products\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsToMany does not specify its types\: TRelatedModel, TDeclaringModel, TPivotModel, TAccessor \(2\-4 required\)$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/size.php
+
+		-
+			message: '#^Offset ''Beyaz'' might not exist on non\-empty\-array\{Siyah\?\: App\\Models\\FeatureValue, Beyaz\?\: App\\Models\\FeatureValue, Kırmızı\?\: App\\Models\\FeatureValue, Mavi\?\: App\\Models\\FeatureValue, Yeşil\?\: App\\Models\\FeatureValue, Sarı\?\: App\\Models\\FeatureValue, Lacivert\?\: App\\Models\\FeatureValue, Gri\?\: App\\Models\\FeatureValue, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: database/seeders/GeneralSeeder.php
+
+		-
+			message: '#^Offset ''Haki'' might not exist on non\-empty\-array\{Siyah\?\: App\\Models\\FeatureValue, Beyaz\?\: App\\Models\\FeatureValue, Kırmızı\?\: App\\Models\\FeatureValue, Mavi\?\: App\\Models\\FeatureValue, Yeşil\?\: App\\Models\\FeatureValue, Sarı\?\: App\\Models\\FeatureValue, Lacivert\?\: App\\Models\\FeatureValue, Gri\?\: App\\Models\\FeatureValue, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: database/seeders/GeneralSeeder.php
+
+		-
+			message: '#^Offset ''Lacivert'' might not exist on non\-empty\-array\{Siyah\?\: App\\Models\\FeatureValue, Beyaz\?\: App\\Models\\FeatureValue, Kırmızı\?\: App\\Models\\FeatureValue, Mavi\?\: App\\Models\\FeatureValue, Yeşil\?\: App\\Models\\FeatureValue, Sarı\?\: App\\Models\\FeatureValue, Lacivert\?\: App\\Models\\FeatureValue, Gri\?\: App\\Models\\FeatureValue, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: database/seeders/GeneralSeeder.php
+
+		-
+			message: '#^Offset ''Mavi'' might not exist on non\-empty\-array\{Siyah\?\: App\\Models\\FeatureValue, Beyaz\?\: App\\Models\\FeatureValue, Kırmızı\?\: App\\Models\\FeatureValue, Mavi\?\: App\\Models\\FeatureValue, Yeşil\?\: App\\Models\\FeatureValue, Sarı\?\: App\\Models\\FeatureValue, Lacivert\?\: App\\Models\\FeatureValue, Gri\?\: App\\Models\\FeatureValue, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: database/seeders/GeneralSeeder.php
+
+		-
+			message: '#^Offset ''Siyah'' might not exist on non\-empty\-array\{Siyah\?\: App\\Models\\FeatureValue, Beyaz\?\: App\\Models\\FeatureValue, Kırmızı\?\: App\\Models\\FeatureValue, Mavi\?\: App\\Models\\FeatureValue, Yeşil\?\: App\\Models\\FeatureValue, Sarı\?\: App\\Models\\FeatureValue, Lacivert\?\: App\\Models\\FeatureValue, Gri\?\: App\\Models\\FeatureValue, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: database/seeders/GeneralSeeder.php

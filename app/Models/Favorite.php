@@ -1,18 +1,19 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Favorite extends Model 
+class Favorite extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'product_id',
         'user_id',
-        'value'
+        'value',
     ];
 
     public function user(): BelongsTo

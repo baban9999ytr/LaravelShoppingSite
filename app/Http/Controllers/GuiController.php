@@ -5,53 +5,46 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Feature;
 use App\Models\Product;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Models\ProductVariant;
-use App\Models\FeatureValue;
-
-use Exception;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Throwable;
 
 class GuiController extends Controller
-{public function productDetails(string $productIdentifier)
 {
-    try {
-        $product = Product::with([
-            'categories',
-            'featureValues.feature',
-            'variants.featureValues.feature',
-        ])
-        ->where('slug', $productIdentifier)
-        ->orWhere('id', $productIdentifier)
-        ->firstOrFail();
+    public function productDetails(string $productIdentifier)
+    {
+        try {
+            $product = Product::with([
+                'categories',
+                'featureValues.feature',
+                'variants.featureValues.feature',
+            ])
+                ->where('slug', $productIdentifier)
+                ->orWhere('id', $productIdentifier)
+                ->firstOrFail();
 
-        return Inertia::render('Shop/Details', [
-            'product'       => $product,
-            'categories'    => $product->categories,
-            'featureValues' => $product->featureValues,
-            'variants'      => $product->variants,
-        ]);
-    } catch (Exception $e) {
-        return redirect()->route('home')->withErrors([
-            'error' => 'Aradığınız ürün bulunamadı.',
-        ]);
-    } catch (Throwable $e) {
-        Log::error('ProductController@productDetails failed: ' . $e->getMessage());
+            return Inertia::render('Shop/Details', [
+                'product' => $product,
+                'categories' => $product->categories,
+                'featureValues' => $product->featureValues,
+                'variants' => $product->variants,
+            ]);
+        } catch (Exception $e) {
+            return redirect()->route('home')->withErrors([
+                'error' => 'Aradığınız ürün bulunamadı.',
+            ]);
+        } catch (Throwable $e) {
+            Log::error('ProductController@productDetails failed: '.$e->getMessage());
 
-        return redirect()->route('home')->withErrors([
-            'error' => 'Ürün detayları yüklenirken bir sorun oluştu.',
-        ]);
+            return redirect()->route('home')->withErrors([
+                'error' => 'Ürün detayları yüklenirken bir sorun oluştu.',
+            ]);
+        }
     }
-}
+
     public function index(Request $request): Response
     {
         $categories = Category::defaultOrder()->get()->toTree()->toArray();
@@ -61,7 +54,7 @@ class GuiController extends Controller
         $query = Product::with([
             'categories',
             'featureValues.feature',
-            'variants.featureValues.feature'
+            'variants.featureValues.feature',
         ]);
 
         if ($request->filled('category')) {
@@ -93,7 +86,7 @@ class GuiController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         if ($request->filled('min_price')) {
@@ -108,9 +101,9 @@ class GuiController extends Controller
 
         return Inertia::render('Shop/Index', [
             'categories' => $categories,
-            'features'   => $features,
-            'products'   => $products,
-            'filters'    => $request->only(['category', 'features', 'search', 'min_price', 'max_price']),
+            'features' => $features,
+            'products' => $products,
+            'filters' => $request->only(['category', 'features', 'search', 'min_price', 'max_price']),
         ]);
     }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('meta_title', 60)->nullable();
             $table->string('meta_description', 160)->nullable();
-            $table->decimal('price', 10, 2)->default(0.00); 
+            $table->decimal('price', 10, 2)->default(0.00);
             $table->string('image_url')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -31,15 +31,15 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->primary(['user_id', 'product_id']);
-            $table->timestamps(); 
+            $table->timestamps();
         });
 
         Schema::create('favorites', function (Blueprint $table) {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->string('value')->nullable(); 
+            $table->string('value')->nullable();
             $table->primary(['user_id', 'product_id']);
-            $table->timestamps(); 
+            $table->timestamps();
         });
 
         Schema::create('product_variants', function (Blueprint $table) {
@@ -48,8 +48,8 @@ return new class extends Migration
             $table->string('sku')->unique();
             $table->decimal('price', 10, 2);
             $table->integer('stock')->default(0);
-            $table->string('color')->nullable(); 
-            $table->string('size')->nullable();  
+            $table->string('color')->nullable();
+            $table->string('size')->nullable();
             $table->string('image_url')->nullable();
             $table->json('attributes')->nullable();
             $table->timestamps();

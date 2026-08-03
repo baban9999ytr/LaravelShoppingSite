@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -11,7 +12,7 @@ class CheckRole
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== $role) {
+        if (! $user || $user->role !== $role) {
             abort(403, 'Unauthorized action.');
         }
 

@@ -2,17 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Category;
+use App\Models\Favorite;
 use App\Models\Feature;
 use App\Models\FeatureValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\User;
 use App\Models\Team;
-use App\Models\Favorite;
-use App\Models\ShoppingBasket;
-
+use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -168,7 +166,7 @@ class GeneralSeeder extends Seeder
             'Siyah', 'Beyaz', 'Kırmızı', 'Mavi', 'Yeşil',
             'Sarı', 'Lacivert', 'Gri', 'Kahverengi', 'Bej',
             'Bordo', 'Pembe', 'Mor', 'Turuncu', 'Haki',
-            'Antrasit', 'Turkuaz', 'Krem', 'Taba', 'Zümrüt Yeşili'
+            'Antrasit', 'Turkuaz', 'Krem', 'Taba', 'Zümrüt Yeşili',
         ];
 
         $colorValues = [];
