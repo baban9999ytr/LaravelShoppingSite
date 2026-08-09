@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Favorite;
+use App\Models\ShoppingBasket;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -21,6 +23,14 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'user_favorites' => $request->user()
+                ? Favorite::where('user_id', $request->user()->id)->pluck('product_id')->toArray()
+                : [],
+            'user_basket' => $request->user()
+                ? ShoppingBasket::where('user_id', $request->user()->id)
+                    ->with(['product.categories', 'variant.featureValues.feature'])
+                    ->get()
+                : [],
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
                 'success' => fn () => $request->session()->get('success'),

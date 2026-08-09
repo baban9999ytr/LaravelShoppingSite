@@ -71,6 +71,7 @@ const props = withDefaults(defineProps<Props>(), {
     user_basket: () => [],
 });
 
+const loadingProductId = ref<number | null>(null);
 const isUserMenuOpen = ref(false);
 const search = ref(props.filters?.search || '');
 const openMenuId = ref<number | null>(null);
@@ -178,12 +179,17 @@ const toggleFavorite = (productId: number) => {
         return;
     }
 
+    loadingProductId.value = productId;
     router.post(
         '/favorites/toggle',
         { product_id: productId },
         {
             preserveScroll: true,
             preserveState: true,
+            only: ['user_favorites'],
+            onFinish: () => {
+                loadingProductId.value = null;
+            },
         },
     );
 };
@@ -195,23 +201,29 @@ const addToCart = (productId: number) => {
         return;
     }
 
+    loadingProductId.value = productId;
     router.post(
         '/basket/add',
         { product_id: productId },
         {
             preserveScroll: true,
             preserveState: true,
+            only: ['user_basket'],
+            onFinish: () => {
+                loadingProductId.value = null;
+            },
         },
     );
 };
 
 const isFavorite = (productId: number): boolean => {
-    return props.user_favorites
-        ? props.user_favorites.includes(productId)
-        : false;
+    if (!props.user_favorites || !props.user_favorites.length) {
+        return false;
+    }
+
+    return props.user_favorites.some((id) => Number(id) === Number(productId));
 };
 </script>
-
 <template>
     <div class="min-h-screen bg-gray-50 font-sans text-gray-800">
         <div

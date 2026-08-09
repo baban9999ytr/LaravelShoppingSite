@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Favorite;
 use App\Models\Feature;
 use App\Models\Product;
+use App\Models\ShoppingBasket;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -104,6 +106,36 @@ class GuiController extends Controller
             'features' => $features,
             'products' => $products,
             'filters' => $request->only(['category', 'features', 'search', 'min_price', 'max_price']),
+        ]);
+    }
+
+    public function favorites(Request $request): Response
+    {
+        $favorites = Favorite::where('user_id', $request->user()->id)
+            ->with([
+                'product.categories',
+                'product.featureValues.feature',
+                'product.variants.featureValues.feature',
+            ])
+            ->get();
+
+        return Inertia::render('Shop/Favorites', [
+            'favorites' => $favorites,
+        ]);
+    }
+
+    public function cart(Request $request): Response
+    {
+        $basketItems = ShoppingBasket::where('user_id', $request->user()->id)
+            ->with([
+                'product.categories',
+                'product.variants',
+                'variant.featureValues.feature',
+            ])
+            ->get();
+
+        return Inertia::render('Shop/Cart', [
+            'basket' => $basketItems,
         ]);
     }
 }

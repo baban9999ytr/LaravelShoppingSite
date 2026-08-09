@@ -9,7 +9,6 @@ use App\Models\FeatureValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ShoppingBasket;
-use App\Models\User;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,7 +37,6 @@ class ProductController extends Controller
                 'variants.featureValues.feature',
             ]);
 
-            // Filter: Category & Descendants
             if ($request->filled('category')) {
                 $slug = strtolower($request->category);
                 $selectedCategories = Category::whereRaw('LOWER(slug) = ?', [$slug])->get();
@@ -56,7 +54,6 @@ class ProductController extends Controller
                 }
             }
 
-            // Filter: Features
             if ($request->filled('features')) {
                 $featureValueIds = (array) $request->features;
                 $query->whereHas('featureValues', function ($q) use ($featureValueIds) {
@@ -64,12 +61,10 @@ class ProductController extends Controller
                 });
             }
 
-            // Filter: Search keyword
             if ($request->filled('search')) {
                 $query->where('name', 'like', '%'.$request->search.'%');
             }
 
-            // Filter: Price range
             if ($request->filled('min_price')) {
                 $query->where('price', '>=', $request->min_price);
             }
@@ -80,7 +75,6 @@ class ProductController extends Controller
 
             $products = $query->latest()->paginate(12)->withQueryString();
 
-            // Retrieve user's favorited product IDs for fast active-state rendering
             $userFavoriteProductIds = [];
             if ($request->user()) {
                 $userFavoriteProductIds = Favorite::where('user_id', $request->user()->id)
@@ -510,29 +504,116 @@ class ProductController extends Controller
     // endregion
 
     // region Shopping Basket
+    public function updateCartItem(Request $request, ShoppingBasket $shoppingBasket): RedirectResponse
+    {
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        try {
+            if ($shoppingBasket->user_id !== $request->user()->id) {
+                abort(403);
+            }
+
+            $maxStock = 99;
+            if ($shoppingBasket->variant_id) {
+                $variant = ProductVariant::where('product_id', $shoppingBasket->product_id)
+                    ->findOrFail($shoppingBasket->variant_id);
+                $maxStock = $variant->stock;
+            }
+
+            if ($validated['quantity'] > $maxStock) {
+                return redirect()->back()->withErrors([
+                    'error' => "Sepetinizdeki miktar ürün stok sınırına ({$maxStock}) ulaştı.",
+                ]);
+            }
+
+            $shoppingBasket->quantity = $validated['quantity'];
+            $shoppingBasket->save();
+
+            return redirect()->back()->with('status', 'Sepet güncellendi.');
+        } catch (Throwable $e) {
+            Log::error('ProductController@updateCartItem failed: '.$e->getMessage());
+
+            return redirect()->back()->withErrors([
+                'error' => 'Sepet güncellenirken bir hata oluştu.',
+            ]);
+        }
+    }
 
     public function addToBasket(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
+            'variant_id' => 'nullable|exists:product_variants,id',
+            'quantity' => 'nullable|integer|min:1',
             'value' => 'nullable|string|max:255',
         ]);
 
         try {
             $userId = $request->user()->id;
+            $productId = $validated['product_id'];
+            $variantId = $validated['variant_id'] ?? null;
+            $quantityToAdd = $validated['quantity'] ?? 1;
+
+            $product = Product::with('variants')->findOrFail($productId);
+
+            if ($product->variants->isNotEmpty() && ! $variantId) {
+                $firstWithStock = $product->variants->first(fn ($v) => $v->stock > 0);
+                $selectedVariant = $firstWithStock ?: $product->variants->first();
+                if ($selectedVariant) {
+                    $variantId = $selectedVariant->id;
+                }
+            }
+
+            if ($variantId) {
+                $variant = ProductVariant::where('product_id', $productId)->findOrFail($variantId);
+                $maxStock = $variant->stock;
+            } else {
+                $maxStock = 99;
+            }
+
+            $basketItem = ShoppingBasket::where('user_id', $userId)
+                ->where('product_id', $productId)
+                ->where('variant_id', $variantId)
+                ->first();
+
+            $currentQty = $basketItem ? $basketItem->quantity : 0;
+            $newQty = $currentQty + $quantityToAdd;
+
+            if ($newQty > $maxStock) {
+                if ($maxStock <= 0) {
+                    return redirect()->back()->withErrors([
+                        'error' => 'Bu ürünün stoğu tükenmiştir.',
+                    ]);
+                }
+
+                if ($currentQty >= $maxStock) {
+                    return redirect()->back()->withErrors([
+                        'error' => "Sepetinizdeki miktar ürün stok sınırına ({$maxStock}) ulaştı.",
+                    ]);
+                }
+
+                $newQty = $maxStock;
+                $message = "Sadece {$maxStock} adet stok bulunduğu için sepetiniz güncellendi.";
+            } else {
+                $message = 'Ürün başarıyla alışveriş sepetine eklendi.';
+            }
 
             ShoppingBasket::updateOrCreate(
                 [
                     'user_id' => $userId,
-                    'product_id' => $validated['product_id'],
+                    'product_id' => $productId,
+                    'variant_id' => $variantId,
                 ],
                 [
+                    'quantity' => $newQty,
                     'value' => $validated['value'] ?? null,
                 ]
             );
 
-            return redirect()->back()->with('status', 'Ürün başarıyla alışveriş sepetine eklendi.');
-        } catch (Exception $e) {
+            return redirect()->back()->with('status', $message);
+        } catch (Throwable $e) {
             Log::error('ProductController@addToBasket failed: '.$e->getMessage());
 
             return redirect()->back()->withErrors([
@@ -541,9 +622,12 @@ class ProductController extends Controller
         }
     }
 
-    public function removeFromBasket(ShoppingBasket $shoppingBasket): RedirectResponse
+    public function removeFromBasket(Request $request, ShoppingBasket $shoppingBasket): RedirectResponse
     {
         try {
+            if ($shoppingBasket->user_id !== $request->user()->id) {
+                abort(403);
+            }
             DB::transaction(function () use ($shoppingBasket) {
                 $shoppingBasket->delete();
             });
@@ -589,28 +673,11 @@ class ProductController extends Controller
             }
 
             return redirect()->back()->with('status', $message);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::error('ProductController@toggleFavorite failed: '.$e->getMessage());
 
             return redirect()->back()->withErrors([
                 'error' => 'Favori işlemi sırasında hata oluştu.',
-            ]);
-        }
-    }
-
-    public function removeFromFavorites(Favorite $favorite): RedirectResponse
-    {
-        try {
-            DB::transaction(function () use ($favorite) {
-                $favorite->delete();
-            });
-
-            return redirect()->back()->with('status', 'Ürün favoriler listesinden çıkarıldı.');
-        } catch (Throwable $e) {
-            Log::error('ProductController@removeFromFavorites failed: '.$e->getMessage());
-
-            return redirect()->back()->withErrors([
-                'error' => 'Ürün çıkarılırken bir hata oluştu.',
             ]);
         }
     }

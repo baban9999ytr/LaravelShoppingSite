@@ -28,9 +28,12 @@ return new class extends Migration
         });
 
         Schema::create('shopping_basket', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->primary(['user_id', 'product_id']);
+            $table->foreignId('variant_id')->nullable()->constrained('product_variants')->cascadeOnDelete();
+            $table->integer('quantity')->default(1);
+            $table->string('value')->nullable();
             $table->timestamps();
         });
 

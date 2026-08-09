@@ -55,7 +55,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"npm run dev\" --names='server,queue,vite'"
+            "npx cross-env APP_URL=http://127.0.0.1:8000 concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=127.0.0.1 --port=8000\" \"php artisan queue:listen --tries=1 --timeout=0\" \"npm run dev\" --names='server,queue,vite'"
         ],
         "lint": [
             "pint --parallel"
@@ -63,6 +63,26 @@
         "lint:check": [
             "pint --parallel --test"
         ],
+        "lint:php": [
+            "php artisan wayfinder:generate",
+            "./vendor/bin/pint --parallel",
+            "php artisan config:clear",
+            "php artisan route:clear",
+            "php artisan cache:clear",
+            "vendor/bin/phpstan analyse --generate-baseline"
+        ],
+        "lint:frontend": [
+            "php artisan wayfinder:generate",
+            "npx prettier --write --cache resources/",
+            "npm run format",
+            "npm run lint -- --fix",
+            "npm run types:check"
+        ],
+        "types:check": [
+            "php artisan wayfinder:generate",
+            "vue-tsc --noEmit"
+        ],
+        "gitte": "php -r \"$m=$argv[1]??'update'; passthru('composer run lint:frontend && composer run lint:php && composer run ci:check && git add . && git commit -m ' . escapeshellarg($m) . ' && git push', $r); exit($r);\" --",
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
             "npm run lint:check",

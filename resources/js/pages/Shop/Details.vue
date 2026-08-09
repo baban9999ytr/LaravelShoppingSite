@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, Head } from '@inertiajs/vue3';
+import { router, Link, Head, usePage } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
 interface Category {
@@ -28,6 +28,7 @@ interface Variant {
     size?: string;
     image_url?: string;
     featureValues?: FeatureValue[];
+    feature_values?: FeatureValue[];
     [key: string]: any;
 }
 
@@ -54,10 +55,14 @@ const props = withDefaults(defineProps<Props>(), {
     variants: () => [],
 });
 
+const page = usePage();
+
 const selectedVariant = ref<Variant | null>(
     props.variants && props.variants.length ? props.variants[0] : null,
 );
 const quantity = ref(1);
+const loadingFavorite = ref(false);
+const loadingCart = ref(false);
 
 const activeImage = ref<string>(
     selectedVariant.value?.image_url ||
@@ -107,6 +112,20 @@ const currentStock = computed<number>(() => {
     return 99;
 });
 
+const userFavorites = computed<number[]>(() => {
+    return (page.props.user_favorites as number[]) || [];
+});
+
+const isFavorited = computed<boolean>(() => {
+    return userFavorites.value.some(
+        (id: number) => Number(id) === Number(props.product.id),
+    );
+});
+
+const auth = computed(() => {
+    return page.props.auth as { user?: any } | undefined;
+});
+
 const selectVariant = (variant: Variant) => {
     selectedVariant.value = variant;
 
@@ -131,9 +150,53 @@ const decrementQty = () => {
     }
 };
 
+const toggleFavorite = () => {
+    if (!auth.value?.user) {
+        router.get('/login');
+
+        return;
+    }
+
+    loadingFavorite.value = true;
+    router.post(
+        '/favorites/toggle',
+        { product_id: props.product.id },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => {
+                loadingFavorite.value = false;
+            },
+        },
+    );
+};
+
 const addToCart = () => {
-    alert(
-        `Added ${quantity.value} x "${props.product.name}" (${selectedVariant.value ? 'SKU: ' + currentSku.value : 'Standard'}) to cart!`,
+    if (!auth.value?.user) {
+        router.get('/login');
+
+        return;
+    }
+
+    if (currentStock.value <= 0) {
+        return;
+    }
+
+    loadingCart.value = true;
+    router.post(
+        '/basket/add',
+        {
+            product_id: props.product.id,
+            variant_id: selectedVariant.value?.id || null,
+            quantity: quantity.value,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => {
+                loadingCart.value = false;
+            },
+        },
     );
 };
 </script>
@@ -169,7 +232,45 @@ const addToCart = () => {
                         >
                             ← Back to Shop
                         </Link>
-                        <button
+
+                        <Link
+                            href="/favorites"
+                            class="relative flex flex-col items-center text-gray-700 hover:text-red-600"
+                        >
+                            <svg
+                                class="h-6 w-6"
+                                :class="
+                                    userFavorites.length
+                                        ? 'fill-current text-red-500'
+                                        : ''
+                                "
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.8"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                    :fill="
+                                        userFavorites.length
+                                            ? 'currentColor'
+                                            : 'none'
+                                    "
+                                />
+                            </svg>
+                            <span class="mt-0.5 text-[11px]">Favorites</span>
+                            <span
+                                v-if="userFavorites.length"
+                                class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
+                            >
+                                {{ userFavorites.length }}
+                            </span>
+                        </Link>
+
+                        <Link
+                            href="/basket"
                             class="relative flex flex-col items-center text-gray-700 hover:text-blue-600"
                         >
                             <svg
@@ -186,7 +287,7 @@ const addToCart = () => {
                                 />
                             </svg>
                             <span class="mt-0.5 text-[11px]">Cart</span>
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -247,11 +348,19 @@ const addToCart = () => {
                         />
 
                         <button
-                            class="absolute top-4 right-4 rounded-full bg-white/80 p-2 shadow backdrop-blur transition-colors hover:text-red-500"
+                            @click.prevent="toggleFavorite"
+                            :disabled="loadingFavorite"
+                            class="absolute top-4 right-4 rounded-full p-2 shadow backdrop-blur transition-all duration-300"
+                            :class="
+                                isFavorited
+                                    ? 'bg-red-50 text-red-500 ring-2 ring-red-200'
+                                    : 'bg-white/80 text-gray-400 hover:bg-red-50 hover:text-red-500'
+                            "
                         >
                             <svg
-                                class="h-5 w-5"
-                                fill="none"
+                                class="h-5 w-5 transition-transform duration-300"
+                                :class="isFavorited ? 'scale-110' : 'scale-100'"
+                                :fill="isFavorited ? 'currentColor' : 'none'"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
@@ -320,7 +429,11 @@ const addToCart = () => {
                                     selectedVariant?.id === v.id
                                         ? 'border-blue-600 bg-blue-50/50 ring-1 ring-blue-600'
                                         : 'border-gray-200 bg-white hover:border-gray-300',
+                                    (v.stock ?? 0) <= 0
+                                        ? 'cursor-not-allowed opacity-50'
+                                        : '',
                                 ]"
+                                :disabled="(v.stock ?? 0) <= 0"
                             >
                                 <div
                                     class="flex w-full items-center justify-between"
@@ -341,18 +454,42 @@ const addToCart = () => {
                                 </div>
 
                                 <div
-                                    v-if="
-                                        v.featureValues &&
-                                        v.featureValues.length
-                                    "
-                                    class="mt-1.5 flex flex-wrap gap-1"
+                                    class="mt-1 flex items-center justify-between"
                                 >
-                                    <span
-                                        v-for="fv in v.featureValues"
-                                        :key="fv.id"
-                                        class="rounded border border-gray-200 bg-white px-1 py-0.5 text-[9px] text-gray-600"
+                                    <div
+                                        v-if="
+                                            (v.feature_values ||
+                                                v.featureValues) &&
+                                            (
+                                                v.feature_values ||
+                                                v.featureValues
+                                            ).length
+                                        "
+                                        class="flex flex-wrap gap-1"
                                     >
-                                        {{ fv.feature?.name }}: {{ fv.value }}
+                                        <span
+                                            v-for="fv in v.feature_values ||
+                                            v.featureValues"
+                                            :key="fv.id"
+                                            class="rounded border border-gray-200 bg-white px-1 py-0.5 text-[9px] text-gray-600"
+                                        >
+                                            {{ fv.feature?.name }}:
+                                            {{ fv.value }}
+                                        </span>
+                                    </div>
+                                    <span
+                                        class="text-[10px] font-medium"
+                                        :class="
+                                            (v.stock ?? 0) > 0
+                                                ? 'text-emerald-600'
+                                                : 'text-rose-500'
+                                        "
+                                    >
+                                        {{
+                                            (v.stock ?? 0) > 0
+                                                ? `${v.stock} stok`
+                                                : 'Tükendi'
+                                        }}
                                     </span>
                                 </div>
                             </button>
@@ -406,10 +543,11 @@ const addToCart = () => {
 
                             <button
                                 @click="addToCart"
-                                :disabled="currentStock <= 0"
+                                :disabled="currentStock <= 0 || loadingCart"
                                 class="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-sm font-bold tracking-wider text-white uppercase shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                             >
-                                Sepete Ekle
+                                <span v-if="loadingCart">Ekleniyor...</span>
+                                <span v-else>Sepete Ekle</span>
                             </button>
                         </div>
                     </div>

@@ -13,6 +13,8 @@ class ShoppingBasket extends Model
     protected $fillable = [
         'product_id',
         'user_id',
+        'variant_id',
+        'quantity',
         'value',
     ];
 
@@ -24,5 +26,10 @@ class ShoppingBasket extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
     }
 }

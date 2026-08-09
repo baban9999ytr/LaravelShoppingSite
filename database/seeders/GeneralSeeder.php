@@ -11,6 +11,7 @@ use App\Models\ProductVariant;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -19,24 +20,21 @@ class GeneralSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Create or retrieve the User
         $user = User::firstOrCreate(
             ['email' => 'gogsalmustafa19@gmail.com'],
             [
                 'name' => 'Mustafa Göksal',
-                'password' => Hash::make('qwe123'),
+                'password' => Hash::make('qwer1234'),
                 'email_verified_at' => now(),
                 'role' => 'admin',
             ]
         );
 
-        // 2. Safely Create and attach a Team if the user doesn't have one
         if (class_exists(Team::class) && ! $user->current_team_id) {
             $teamData = [
                 'name' => "Mustafa's Team",
             ];
 
-            // Dynamically assign owner column depending on your schema
             if (Schema::hasColumn('teams', 'user_id')) {
                 $teamData['user_id'] = $user->id;
             } elseif (Schema::hasColumn('teams', 'owner_id')) {
@@ -58,104 +56,146 @@ class GeneralSeeder extends Seeder
             ])->save();
         }
 
-        // --- REST OF YOUR SEEDER CONTENT ---
+        $now = now();
 
-        $urunler = Category::create([
+        $urunlerId = DB::table('categories')->insertGetId([
             'name' => 'Ürünler',
             'slug' => 'urunler',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $saticilar = Category::create([
+        $saticilarId = DB::table('categories')->insertGetId([
             'name' => 'Satıcılar / Markalar',
             'slug' => 'saticilar-markalar',
-            'parent_id' => $urunler->id,
+            'parent_id' => $urunlerId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         $brandNames = ['Tudors', 'Altınyıldız', 'Mavi'];
-        $brandCategories = [];
         foreach ($brandNames as $brand) {
-            $brandCategories[$brand] = Category::create([
+            DB::table('categories')->insert([
                 'name' => $brand,
                 'slug' => Str::slug($brand),
-                'parent_id' => $saticilar->id,
+                'parent_id' => $saticilarId,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
 
-        $sezonlar = Category::create([
+        $sezonlarId = DB::table('categories')->insertGetId([
             'name' => 'Sezonlar',
             'slug' => 'sezonlar',
-            'parent_id' => $urunler->id,
+            'parent_id' => $urunlerId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         $seasonNames = ['Kışlık', 'Yazlık', 'Sonbaharlık', 'İlkbaharlık'];
-        $seasonCategories = [];
         foreach ($seasonNames as $season) {
-            $seasonCategories[$season] = Category::create([
+            DB::table('categories')->insert([
                 'name' => $season,
                 'slug' => Str::slug($season),
-                'parent_id' => $sezonlar->id,
+                'parent_id' => $sezonlarId,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
 
-        $giyim = Category::create([
+        $giyimId = DB::table('categories')->insertGetId([
             'name' => 'Giyim',
             'slug' => 'giyim',
-            'parent_id' => $urunler->id,
+            'parent_id' => $urunlerId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $kadinGiyim = Category::create([
+        $kadinGiyimId = DB::table('categories')->insertGetId([
             'name' => 'Kadın',
             'slug' => 'kadin',
-            'parent_id' => $giyim->id,
+            'parent_id' => $giyimId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $erkekGiyim = Category::create([
+        $erkekGiyimId = DB::table('categories')->insertGetId([
             'name' => 'Erkek',
             'slug' => 'erkek',
-            'parent_id' => $giyim->id,
+            'parent_id' => $giyimId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $unisexGiyim = Category::create([
+        $unisexGiyimId = DB::table('categories')->insertGetId([
             'name' => 'Unisex',
             'slug' => 'unisex',
-            'parent_id' => $giyim->id,
+            'parent_id' => $giyimId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $kadinUst = Category::create([
+        $kadinUstId = DB::table('categories')->insertGetId([
             'name' => 'Üst Giyim',
             'slug' => 'kadin-ust-giyim',
-            'parent_id' => $kadinGiyim->id,
+            'parent_id' => $kadinGiyimId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $kadinMont = Category::create([
+        $kadinMontId = DB::table('categories')->insertGetId([
             'name' => 'Mont',
             'slug' => 'kadin-mont',
-            'parent_id' => $kadinUst->id,
+            'parent_id' => $kadinUstId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $erkekUst = Category::create([
+        $erkekUstId = DB::table('categories')->insertGetId([
             'name' => 'Üst Giyim',
             'slug' => 'erkek-ust-giyim',
-            'parent_id' => $erkekGiyim->id,
+            'parent_id' => $erkekGiyimId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $erkekGömlek = Category::create([
+        $erkekGömlekId = DB::table('categories')->insertGetId([
             'name' => 'Gömlek',
             'slug' => 'erkek-gomlek',
-            'parent_id' => $erkekUst->id,
+            'parent_id' => $erkekUstId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $erkekAlt = Category::create([
+        $erkekAltId = DB::table('categories')->insertGetId([
             'name' => 'Alt Giyim',
             'slug' => 'erkek-alt-giyim',
-            'parent_id' => $erkekGiyim->id,
+            'parent_id' => $erkekGiyimId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        $erkekPantolon = Category::create([
+        $erkekPantolonId = DB::table('categories')->insertGetId([
             'name' => 'Kot Pantolon',
             'slug' => 'erkek-kot-pantolon',
-            'parent_id' => $erkekAlt->id,
+            'parent_id' => $erkekAltId,
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
+
+        Category::fixTree();
+
+        $erkekGömlek = Category::find($erkekGömlekId);
+        $tudorsBrand = Category::where('slug', 'tudors')->first();
+        $sonbaharlikSeason = Category::where('slug', 'sonbaharlik')->first();
+
+        $kadinMont = Category::find($kadinMontId);
+        $maviBrand = Category::where('slug', 'mavi')->first();
+        $kislikSeason = Category::where('slug', 'kislik')->first();
+
+        $erkekPantolon = Category::find($erkekPantolonId);
+        $altinyildizBrand = Category::where('slug', 'altinyildiz')->first();
+        $yazlikSeason = Category::where('slug', 'yazlik')->first();
 
         $renkFeature = Feature::create([
             'name' => 'Renk',
@@ -217,8 +257,8 @@ class GeneralSeeder extends Seeder
 
         $p1->categories()->sync([
             $erkekGömlek->id,
-            $brandCategories['Tudors']->id,
-            $seasonCategories['Sonbaharlık']->id,
+            $tudorsBrand->id,
+            $sonbaharlikSeason->id,
         ]);
 
         $p1->featureValues()->sync([
@@ -259,8 +299,8 @@ class GeneralSeeder extends Seeder
 
         $p2->categories()->sync([
             $kadinMont->id,
-            $brandCategories['Mavi']->id,
-            $seasonCategories['Kışlık']->id,
+            $maviBrand->id,
+            $kislikSeason->id,
         ]);
 
         $p2->featureValues()->sync([
@@ -291,9 +331,9 @@ class GeneralSeeder extends Seeder
 
         $p3->categories()->sync([
             $erkekPantolon->id,
-            $brandCategories['Altınyıldız']->id,
-            $seasonCategories['Yazlık']->id,
-            $seasonCategories['Sonbaharlık']->id,
+            $altinyildizBrand->id,
+            $yazlikSeason->id,
+            $sonbaharlikSeason->id,
         ]);
 
         $p3->featureValues()->sync([

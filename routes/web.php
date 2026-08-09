@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-// Main Shop Index as Home
 Route::get('/', [GuiController::class, 'index'])->name('shop.index');
 Route::get('/home', fn () => redirect()->route('shop.index'))->name('home');
 
@@ -24,8 +23,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
     Route::delete('invitations/{invitation}', [TeamInvitationController::class, 'decline'])->name('invitations.decline');
 
+    Route::get('/favorites', [GuiController::class, 'favorites'])->name('favorites.index');
     Route::post('/favorites/toggle', [ProductController::class, 'toggleFavorite'])->name('favorites.toggle');
+    Route::delete('/favorites/{product_id}', [ProductController::class, 'removeFavorite'])->name('favorites.remove');
+
+    Route::get('/basket', [GuiController::class, 'cart'])->name('basket.index');
     Route::post('/basket/add', [ProductController::class, 'AddToBasket'])->name('basket.add');
+    Route::post('/basket/update/{shoppingBasket}', [ProductController::class, 'updateCartItem'])->name('basket.update');
+    Route::delete('/basket/remove/{shoppingBasket}', [ProductController::class, 'removeFromBasket'])->name('basket.remove');
 
     Route::get('/products/{productIdentifier}', [GuiController::class, 'productDetails'])->name('products.show');
 });
