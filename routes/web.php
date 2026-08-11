@@ -13,12 +13,23 @@ use Illuminate\Support\Facades\Storage;
 Route::get('/', [GuiController::class, 'index'])->name('shop.index');
 Route::get('/home', fn () => redirect()->route('shop.index'))->name('home');
 
+// Route::middleware(['auth'])->get('/dashboard', function (Request $request) {
+//     $team = $request->user()->currentTeam;
+
+//     if (! $team) {
+//         return redirect()->route('shop.index');
+//     }
+
+//     return redirect()->route('dashboard', ['current_team' => $team->slug ?? $team->id]);
+// });
+Route::middleware(['auth'])->get('/dashboard', function (Request $request) {
+    return redirect()->route('shop.index');
+});
 Route::prefix('{current_team}')
-    ->middleware(['auth', 'verified', EnsureTeamMembership::class])
+    ->middleware(['auth', EnsureTeamMembership::class])
     ->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
     });
-
 Route::middleware(['auth'])->group(function () {
     Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
     Route::delete('invitations/{invitation}', [TeamInvitationController::class, 'decline'])->name('invitations.decline');
@@ -65,12 +76,6 @@ Route::get('/media/music/{filename}', function ($filename) {
     return response()->file($disk->path($relativePath));
 })->name('music.stream');
 
-Route::middleware(['auth'])->get('/dashboard-redirect', function (Request $request) {
-    $team = $request->user()->currentTeam;
-
-    if (! $team) {
-        return redirect()->route('shop.index');
-    }
-
-    return redirect()->route('dashboard', ['current_team' => $team->slug ?? $team->id]);
+Route::fallback(function () {
+    return redirect()->route('shop.index');
 });

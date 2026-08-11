@@ -80,7 +80,8 @@
         ],
         "types:check": [
             "php artisan wayfinder:generate",
-            "vue-tsc --noEmit"
+            "vue-tsc --noEmit",
+            "phpstan analyse"
         ],
         "gitte": "php -r \"$m=$argv[1]??'update'; passthru('composer run lint:frontend && composer run lint:php && composer run ci:check && git add . && git commit -m ' . escapeshellarg($m) . ' && git push', $r); exit($r);\" --",
         "ci:check": [
@@ -90,9 +91,7 @@
             "npm run types:check",
             "@test"
         ],
-        "types:check": [
-            "phpstan analyse"
-        ],
+      
         "test": [
             "@php artisan config:clear --ansi",
             "@lint:check",

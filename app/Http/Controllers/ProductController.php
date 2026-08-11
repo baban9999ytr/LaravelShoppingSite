@@ -652,7 +652,9 @@ class ProductController extends Controller
 
 //region order
     public function storeOrder(Request $request): RedirectResponse
-    {
+    {           
+
+
         $validated = $request->validate([
             'origin_city' => 'required|string',
             'destination_city' => 'required|string',
@@ -678,10 +680,13 @@ class ProductController extends Controller
                 $orderedAt
             );
 
-           
             DB::transaction(function () use ($validated, $orderedAt, $estimatedArrival, $user, $basketItems) {
                 
+                $orderItems = [];
+
                 foreach ($basketItems as $item) {
+                    $unitPrice = 0;
+
                     if ($item->variant_id) {
                         $variant = ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
                         
@@ -689,6 +694,7 @@ class ProductController extends Controller
                             throw new Exception("{$item->product->name} ürünü için yeterli stok yok (Kalan stok: " . ($variant->stock ?? 0) . ").");
                         }
                         $variant->decrement('stock', $item->quantity);
+                        $unitPrice = $variant->price ?? $item->product->price ?? 0;
                     } else {
                         if (Schema::hasColumn('products', 'stock')) {
                             $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
@@ -698,24 +704,37 @@ class ProductController extends Controller
                             }
                             $product->decrement('stock', $item->quantity);
                         }
+                        $unitPrice = $item->product->price ?? 0;
                     }
+
+                    $orderItems[] = [
+                        'product_id'   => $item->product_id,
+                        'product_name' => $item->product->name ?? 'Unknown',
+                        'variant_id'   => $item->variant_id,
+                        'quantity'     => $item->quantity,
+                        'unit_price'   => $unitPrice,
+                        'total_price'  => $unitPrice * $item->quantity,
+                    ];
                 }
 
                 ShoppingOrder::create([
-                    'user_id' => $user->id,
-                    'origin_city' => $validated['origin_city'],
-                    'destination_city' => $validated['destination_city'],
-                    'ordered_at' => $orderedAt,
+                    'user_id'              => $user->id,
+                    'origin_city'          => $validated['origin_city'],
+                    'destination_city'     => $validated['destination_city'],
+                    'ordered_at'           => $orderedAt,
                     'estimated_arrival_at' => $estimatedArrival,
+                    'items'                => $orderItems,
                 ]);
 
+                dd('Transaction finished successfully! Order ID created.');
                 ShoppingBasket::where('user_id', $user->id)->delete();
             });
 
             return redirect()->back()->with('status', 'Siparişiniz başarıyla oluşturuldu!');
 
-        } catch (Throwable $e) {
-        
+       } catch (Throwable $e) {
+            dd($e->getMessage());
+
             Log::error('ProductController@storeOrder failed: '.$e->getMessage());
 
             return redirect()->back()->withErrors([
@@ -724,10 +743,7 @@ class ProductController extends Controller
         }
     }
     //endregion
-  
-  
-  
-  
+ 
     //region Favorites
 
     public function toggleFavorite(Request $request): RedirectResponse

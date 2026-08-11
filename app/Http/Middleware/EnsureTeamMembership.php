@@ -41,7 +41,6 @@ class EnsureTeamMembership
         }
 
         $role = $user->teamRole($team);
-
         $requiredRole = TeamRole::tryFrom($minimumRole);
 
         abort_if(
@@ -59,10 +58,18 @@ class EnsureTeamMembership
     {
         $team = $request->route('current_team') ?? $request->route('team');
 
-        if (is_string($team)) {
-            $team = Team::where('slug', $team)->first();
+        if ($team instanceof Team) {
+            return $team;
         }
 
-        return $team;
+        if (is_numeric($team)) {
+            return Team::find($team);
+        }
+
+        if (is_string($team)) {
+            return Team::where('slug', $team)->orWhere('id', $team)->first();
+        }
+
+        return null;
     }
 }
