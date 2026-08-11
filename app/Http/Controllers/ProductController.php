@@ -726,7 +726,6 @@ class ProductController extends Controller
                     'items'                => $orderItems,
                 ]);
 
-                dd('Transaction finished successfully! Order ID created.');
                 ShoppingBasket::where('user_id', $user->id)->delete();
             });
 

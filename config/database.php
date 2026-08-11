@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'pgsql'),
+    'default' => env('DB_CONNECTION', 'sqlite'),
 
     /*
     |--------------------------------------------------------------------------
@@ -29,7 +29,7 @@ return [
 
     'connections' => [
 
-        /*
+    
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
@@ -75,7 +75,7 @@ return [
             'strict' => true,
             'engine' => null,
         ],
-        */
+        
 
        'pgsql' => [
     'driver' => 'pgsql',
@@ -91,7 +91,7 @@ return [
     'search_path' => env('DB_SCHEMA', 'app'),
     'sslmode' => env('DB_SSLMODE', 'require'),
 ],
-        /*
+        
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
@@ -104,7 +104,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
-        */
+        
 
     ],
 
