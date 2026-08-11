@@ -31,7 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/basket/add', [ProductController::class, 'AddToBasket'])->name('basket.add');
     Route::post('/basket/update/{shoppingBasket}', [ProductController::class, 'updateCartItem'])->name('basket.update');
     Route::delete('/basket/remove/{shoppingBasket}', [ProductController::class, 'removeFromBasket'])->name('basket.remove');
-
+    Route::post('/order', [ProductController::class, 'storeOrder'])->name('order.store');
     Route::get('/products/{productIdentifier}', [GuiController::class, 'productDetails'])->name('products.show');
 });
 

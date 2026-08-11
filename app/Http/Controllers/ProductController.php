@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Schema;
 use App\Models\Category;
 use App\Models\Favorite;
 use App\Models\Feature;
 use App\Models\FeatureValue;
 use App\Models\Product;
+use App\Models\ShoppingOrder;            
+use App\Services\DeliveryCalculatorService; 
+use Illuminate\Http\JsonResponse;
 use App\Models\ProductVariant;
 use App\Models\ShoppingBasket;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +29,7 @@ use Throwable;
 
 class ProductController extends Controller
 {
-    // region Storefront Catalog Methods
+    //region Storefront Catalog Methods
 
     public function index(Request $request): Response
     {
@@ -133,9 +139,9 @@ class ProductController extends Controller
         }
     }
 
-    // endregion
+    //endregion
 
-    // region Product CRUD
+    //region Product CRUD
 
     public function store(Request $request): RedirectResponse
     {
@@ -264,9 +270,9 @@ class ProductController extends Controller
         }
     }
 
-    // endregion
+    //endregion
 
-    // region Variant CRUD
+    //region Variant CRUD
 
     public function storeVariant(Request $request): RedirectResponse
     {
@@ -368,9 +374,9 @@ class ProductController extends Controller
         }
     }
 
-    // endregion
+    //endregion
 
-    // region Feature CRUD
+    //region Feature CRUD
 
     public function indexFeatures(): Response
     {
@@ -501,9 +507,9 @@ class ProductController extends Controller
         }
     }
 
-    // endregion
+    //endregion
+//region basket
 
-    // region Shopping Basket
     public function updateCartItem(Request $request, ShoppingBasket $shoppingBasket): RedirectResponse
     {
         $validated = $request->validate([
@@ -642,9 +648,87 @@ class ProductController extends Controller
         }
     }
 
-    // endregion
+    //endregion
 
-    // region Favorites
+//region order
+    public function storeOrder(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'origin_city' => 'required|string',
+            'destination_city' => 'required|string',
+        ]);
+
+        try {
+            $user = $request->user();
+
+            $basketItems = ShoppingBasket::with(['product', 'variant'])
+                ->where('user_id', $user->id)
+                ->get();
+
+            if ($basketItems->isEmpty()) {
+                return redirect()->back()->withErrors([
+                    'error' => 'Sepetiniz boş olduğu için sipariş verilemez.',
+                ]);
+            }
+
+            $orderedAt = now();
+            $estimatedArrival = DeliveryCalculatorService::calculateEstimatedArrival(
+                $validated['origin_city'],
+                $validated['destination_city'],
+                $orderedAt
+            );
+
+           
+            DB::transaction(function () use ($validated, $orderedAt, $estimatedArrival, $user, $basketItems) {
+                
+                foreach ($basketItems as $item) {
+                    if ($item->variant_id) {
+                        $variant = ProductVariant::where('id', $item->variant_id)->lockForUpdate()->first();
+                        
+                        if (!$variant || $variant->stock < $item->quantity) {
+                            throw new Exception("{$item->product->name} ürünü için yeterli stok yok (Kalan stok: " . ($variant->stock ?? 0) . ").");
+                        }
+                        $variant->decrement('stock', $item->quantity);
+                    } else {
+                        if (Schema::hasColumn('products', 'stock')) {
+                            $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
+                            
+                            if (!$product || $product->stock < $item->quantity) {
+                                throw new Exception("{$item->product->name} ürünü için yeterli stok yok.");
+                            }
+                            $product->decrement('stock', $item->quantity);
+                        }
+                    }
+                }
+
+                ShoppingOrder::create([
+                    'user_id' => $user->id,
+                    'origin_city' => $validated['origin_city'],
+                    'destination_city' => $validated['destination_city'],
+                    'ordered_at' => $orderedAt,
+                    'estimated_arrival_at' => $estimatedArrival,
+                ]);
+
+                ShoppingBasket::where('user_id', $user->id)->delete();
+            });
+
+            return redirect()->back()->with('status', 'Siparişiniz başarıyla oluşturuldu!');
+
+        } catch (Throwable $e) {
+        
+            Log::error('ProductController@storeOrder failed: '.$e->getMessage());
+
+            return redirect()->back()->withErrors([
+                'error' => 'Sipariş oluşturulamadı: ' . $e->getMessage(),
+            ]);
+        }
+    }
+    //endregion
+  
+  
+  
+  
+    //region Favorites
 
     public function toggleFavorite(Request $request): RedirectResponse
     {
@@ -682,9 +766,9 @@ class ProductController extends Controller
         }
     }
 
-    // endregion
+    //endregion
 
-    // region Helpers
+    //region Helpers
 
     private function handleImageToWebp(Request $request): ?string
     {
@@ -751,5 +835,5 @@ class ProductController extends Controller
         return $slug;
     }
 
-    // endregion
+    //endregion
 }

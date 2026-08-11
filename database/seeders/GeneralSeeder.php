@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Models\Favorite;
 use App\Models\Feature;
 use App\Models\FeatureValue;
 use App\Models\Product;
@@ -341,14 +340,28 @@ class GeneralSeeder extends Seeder
             $fabricValues['Kot / Denim']->id,
         ]);
 
-        Favorite::updateOrCreate([
-            'user_id' => $user->id,
-            'product_id' => $p1->id,
-        ], ['value' => 'Favori Ürün 1']);
+        DB::table('favorites')->updateOrInsert(
+            [
+                'user_id' => $user->id,
+                'product_id' => $p1->id,
+            ],
+            [
+                'value' => 'Favori Ürün 1',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]
+        );
 
-        Favorite::updateOrCreate([
-            'user_id' => $user->id,
-            'product_id' => $p2->id,
-        ], ['value' => 'Favori Ürün 2']);
+        DB::table('favorites')->updateOrInsert(
+            [
+                'user_id' => $user->id,
+                'product_id' => $p2->id,
+            ],
+            [
+                'value' => 'Favori Ürün 2',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]
+        );
     }
 }

@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // 1. Create 'products' first so child tables can reference it
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -18,6 +19,20 @@ return new class extends Migration
             $table->decimal('price', 10, 2)->default(0.00);
             $table->string('image_url')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+        // 2. Create 'product_variants' after 'products' exists
+        Schema::create('product_variants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->string('sku')->unique();
+            $table->decimal('price', 10, 2);
+            $table->integer('stock')->default(0);
+            $table->string('color')->nullable();
+            $table->string('size')->nullable();
+            $table->string('image_url')->nullable();
+            $table->json('attributes')->nullable();
             $table->timestamps();
         });
 
@@ -44,27 +59,14 @@ return new class extends Migration
             $table->primary(['user_id', 'product_id']);
             $table->timestamps();
         });
-
-        Schema::create('product_variants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->string('sku')->unique();
-            $table->decimal('price', 10, 2);
-            $table->integer('stock')->default(0);
-            $table->string('color')->nullable();
-            $table->string('size')->nullable();
-            $table->string('image_url')->nullable();
-            $table->json('attributes')->nullable();
-            $table->timestamps();
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('product_variants');
         Schema::dropIfExists('favorites');
         Schema::dropIfExists('shopping_basket');
         Schema::dropIfExists('category_product');
+        Schema::dropIfExists('product_variants');
         Schema::dropIfExists('products');
     }
 };
